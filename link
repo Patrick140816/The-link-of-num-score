@@ -1,1 +1,113 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
 
+struct stu {
+	int num;
+	int score;
+	struct stu* next;
+};
+typedef struct stu NODE;
+
+NODE* create()//创建链表
+{
+	NODE* head, * tail, * pnew;
+	int num,score;
+	head = (NODE*)malloc(sizeof(NODE));
+	if (head == NULL) {
+		printf("Creat error!\n");
+		return 0;
+	}
+	head->next = NULL;
+	tail = head;
+	printf("输入学生的学号和成绩：\n");
+
+	while (1) {
+		scanf("%d%d", &num, &score);
+		if (score < 0)//成绩为负时跳出循环
+			break;
+		pnew = (NODE*)malloc(sizeof(NODE));
+		if (pnew == NULL) {
+			printf("Create error!\n");
+			return NULL;
+		}
+		pnew->score = score;
+		pnew->num = num;
+		pnew->next = NULL;//新节点初始化
+		tail->next = pnew;//新节点插入到表尾
+		tail = pnew;//为指针指向当前的尾节点
+	}
+	return head;//返回创建链表的头指针
+}
+void insert(NODE* head, NODE* pnew, int i)//（指向头的指针、指向新节点的指针、插入的位置）
+{
+	NODE* p;
+	int j;
+	p = head;
+	for (j = 0; j < i && p != NULL; j++) {
+		p = p->next;
+	}
+	if (p == NULL) {
+		printf("insert error.节点不存在。\n");
+		return NULL;
+	}
+	pnew->next = p->next;
+	p->next = pnew;
+}
+void list_delete(NODE* head, int i)
+{
+	NODE* p, * q;
+	int counter;
+	if (i == 0)
+		return;
+	p = head;
+	for (counter = 1; counter < i && p->next != NULL; counter++)
+		p = p->next;
+	if (p->next == NULL) {
+		printf("Not found,\n");
+		return;
+	}
+	q = p->next;
+	p->next = q->next;
+	free(q);
+}
+void output(NODE* head)//输出链表
+{
+	NODE* p;
+	for (p = head->next; p != NULL; p = p->next) {
+		printf("%d %d\n", p->num, p->score);
+	}
+}
+void pfree(NODE* head)//销毁链表
+{
+	NODE* p, * q;
+	p = head;
+	while (p->next != NULL) {
+		q = p->next;
+		p->next = q->next;
+		free(q);
+	}
+	free(head);//删除头节点
+}
+
+int main(void)
+{
+	NODE * head, * pnew;
+	head = create();
+	if (head == NULL) {
+		return 0;
+	}
+	printf("输出创建的链表：\n");
+	output(head);
+	pnew = (NODE*)malloc(sizeof(NODE));
+	if (pnew == NULL) {
+		printf("创建失败！");
+	}
+	scanf("%d%d", &pnew->num, &pnew->score);
+	insert(head, pnew, 3);
+	printf("插入后的链表：\n");
+	output(head);
+	list_delete(head, 3);
+	printf("删除后的链表：\n");
+	output(head);
+	return 0;
+}
